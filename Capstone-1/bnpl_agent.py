@@ -47,7 +47,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
     tools = [
         {
             "type": "function",
-            "name": "bnpl_database_query_1",
+            "name": "bnpl_database_query",
             "description": "Runs a safe SQL query on the BNPL database.",
             "parameters": {
                 "type": "object",

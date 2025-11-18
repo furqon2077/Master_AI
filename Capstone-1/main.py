@@ -2,6 +2,12 @@ import streamlit as st
 from bnpl_agent import run_bnpl_agent
 
 st.title("🦜Wellcome to the BNPL Chatbot App")
+st.write(
+    "You can ask questions about the BNPL transactions dataset. "
+    "The dataset includes merchants such as Amazon, eBay, Walmart, Target, Best Buy, "
+    "IKEA, AliExpress, Apple Store, Nike, and Adidas, and categories such as Health, "
+    "Electronics, Sports and etc."
+)
 openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
 
 def generate_response(text):
