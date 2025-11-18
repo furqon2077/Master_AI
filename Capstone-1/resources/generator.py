@@ -51,7 +51,7 @@ df = pd.DataFrame({
     "default_flag": default_flags
 })
 
-file_path = "db/generated_transactions.csv"
+file_path = "generated_transactions.csv"
 df.to_csv(file_path, index=False)
 
 file_path
