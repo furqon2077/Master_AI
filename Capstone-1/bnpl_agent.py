@@ -3,7 +3,7 @@ import sqlite3
 from openai import OpenAI
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, "db", "bnpl.db")
+DATABASE = os.path.join(BASE_DIR, "Capstone-1", "db", "bnpl.db")
 
 
 # DATABASE = "db/bnpl.db"
