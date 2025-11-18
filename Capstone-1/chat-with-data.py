@@ -21,15 +21,23 @@ tools = [
     {
         "type": "function",
         "name": "bnpl_database_query_1",
-        "description": "Business query #1: runs SQL on BNPL database.",
+        "description": "Business query: runs SQL on BNPL database.",
         "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": f"SQL for BNPL DB:\n{database_schema_string}"}
-            },
-            "required": ["query"],
+            "type": "string",
+                    "description": f"""
+                        Generate an SQL query using the schema:
+                        {database_schema_string}
+
+                        IMPORTANT RULES:
+                        - Use single quotes in SQL normally, like 'Electronics'
+                        - DO NOT escape quotes (no backslashes)
+                        - Output only raw SQL, not JSON, not Python code
+                        - Do not wrap the SQL in quotes
+                    """,
+                "required": ["query"],
+                    }
         },
-    },
+
 
     # Second main tool -------------------------------------------------------
     {

@@ -1,3 +1,7 @@
 TICKET-51839: The user reports that something seems wrong with their results and needs assistance.
 TICKET-96120: The user reports that something is wrong with their results and requests assistance.
 TICKET-52163: The user reports that something is wrong with their results and requests assistance.
+TICKET-13505: User requested to open a support ticket. No specific problem described.
+TICKET-38026: User suspects incorrect results when querying the average purchase amount for the 'Electronics' category.
+TICKET-17463: User reports having an unspecified issue and requests to create a support ticket.
+TICKET-11710: User requested support and wants to open a ticket.

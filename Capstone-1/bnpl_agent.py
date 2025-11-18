@@ -30,7 +30,7 @@ def safe_sql_check(query: str):
 # ------------------------------------
 # SQL TOOL HANDLER
 # ------------------------------------
-def bnpl_database_query_1(query):
+def bnpl_database_query(query):
     safe_sql_check(query)
     print("🔍 Running SQL Query:", query)
     conn = sqlite3.connect(DATABASE)
@@ -56,23 +56,9 @@ def create_support_ticket(issue: str):
 # MAIN AGENT FUNCTION (USED BY STREAMLIT)
 # ------------------------------------
 def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
-    """
-    Runs the BNPL Agent with tools, SQL logic, and support ticket creation.
-    Returns the AI's final polished response as a string (safe for UI).
-    """
 
-    print("\n====================================")
-    print("🤖 New Request:", user_message)
-    print("====================================")
-
-    #
-    # Step 1 — Initialize OpenAI client with API key from Streamlit
-    #
     client = OpenAI(api_key=openai_api_key)
 
-    #
-    # Step 2 — Define tools available to the model
-    #
     tools = [
         {
             "type": "function",
@@ -100,34 +86,29 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
         }
     ]
 
-    #
-    # Step 3 — First model pass: decide if tool call is required
-    #
+
+
     response = client.responses.create(
         model="gpt-4.1-2025-04-14",
         tools=tools,
-        instructions="If user seems frustrated or requests help, call create_support_ticket.",
+        instructions="Respond to the user's question with a clear, concise, markdown-formatted answer based on the database result. Use tables or bullets if helpful.",
         input=[{"role": "user", "content": user_message}],
     )
 
     tool_result = None
 
-    #
-    # Step 4 — Execute the tool if requested
-    #
+
     for item in response.output:
         if item.type == "function_call":
             args = json.loads(item.arguments)
 
-            if item.name == "bnpl_database_query_1":
-                tool_result = bnpl_database_query_1(args["query"])
+            if item.name == "bnpl_database_query":
+                tool_result = bnpl_database_query(args["query"])
 
             elif item.name == "create_support_ticket":
                 tool_result = create_support_ticket(args["issue"])
 
-    #
-    # Step 5 — Second model pass: produce final polished response
-    #
+
     messages_for_final = [
         {"role": "user", "content": user_message},
         {"role": "assistant", "content": str(tool_result)}
@@ -135,11 +116,8 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
 
     final = client.responses.create(
         model="gpt-4.1-2025-04-14",
-        instructions="Provide a clear, final answer. If a ticket was created, mention it.",
+        instructions="Provide a clear, final answer. If a ticket was created, mention it. Show created ticket number.",
         input=messages_for_final,
     )
-
-    print("💬 Final Answer:", final.output_text)
-    print("------------------------------------")
 
     return final.output_text
