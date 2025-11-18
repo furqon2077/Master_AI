@@ -1,5 +1,4 @@
 import streamlit as st
-from langchain_openai.chat_models import ChatOpenAI
 from bnpl_agent import run_bnpl_agent
 
 st.title("🦜Wellcome to the BNPL Chatbot App")
