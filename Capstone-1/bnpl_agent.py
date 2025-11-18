@@ -1,11 +1,8 @@
-import os
 import json
 import sqlite3
 from openai import OpenAI
 
-# ------------------------------------
-# DATABASE CONFIG
-# ------------------------------------
+
 DATABASE = "db/bnpl.db"
 
 database_schema_string = """
@@ -16,9 +13,6 @@ purchase_date, final_due_date, status, credit_score,
 risk_score, late_fee, default_flag
 """
 
-# ------------------------------------
-# SAFETY CHECK
-# ------------------------------------
 def safe_sql_check(query: str):
     dangerous_words = ["drop", "delete", "truncate", "alter"]
     lower_sql = query.lower()
@@ -27,9 +21,7 @@ def safe_sql_check(query: str):
         raise Exception("Operation blocked: Unsafe SQL detected.")
 
 
-# ------------------------------------
-# SQL TOOL HANDLER
-# ------------------------------------
+
 def bnpl_database_query(query):
     safe_sql_check(query)
     print("🔍 Running SQL Query:", query)
@@ -40,9 +32,6 @@ def bnpl_database_query(query):
     return results
 
 
-# ------------------------------------
-# SUPPORT TICKET TOOL
-# ------------------------------------
 def create_support_ticket(issue: str):
     print("📝 Creating Support Ticket:", issue)
     ticket_id = f"TICKET-{abs(hash(issue)) % 100000}"
@@ -52,9 +41,6 @@ def create_support_ticket(issue: str):
     return {"ticket_id": ticket_id, "issue": issue}
 
 
-# ------------------------------------
-# MAIN AGENT FUNCTION (USED BY STREAMLIT)
-# ------------------------------------
 def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
 
     client = OpenAI(api_key=openai_api_key)
