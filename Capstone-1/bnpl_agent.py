@@ -77,7 +77,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
     response = client.responses.create(
         model="gpt-4.1-2025-04-14",
         tools=tools,
-        instructions=
+        instructions=(
             "You are a BNPL assistant. "
             "If the user asks anything related to BNPL data, customers, transactions, "
             "installments, risk scores, payments, due dates, or anything stored "
@@ -101,7 +101,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
             "If the message is a complaint or problem, call create_support_ticket. "
             "Otherwise, respond normally."
             "Always use markdown formatting for SQL queries."
-        ,
+        ),
         input=[{"role": "user", "content": user_message}],
     )
 
@@ -126,7 +126,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
 
     final = client.responses.create(
         model="gpt-4.1-2025-04-14",
-        instructions=
+        instructions=(
             "You are a BNPL assistant. "
             "If the user asks anything related to BNPL data, customers, transactions, "
             "installments, risk scores, payments, due dates, or anything stored in the "
@@ -139,7 +139,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
             "or anything that is not clearly a complaint or problem. "
             "If neither condition applies, respond normally."
             "If a ticket was created, mention the ticket number."
-        ,
+        ),
     input=messages_for_final,
     )
 

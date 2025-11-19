@@ -116,7 +116,7 @@ for request in user_requests:
     response = client.responses.create(
         model=MODEL,
         tools=tools,
-        instructions=
+        instructions=(
             "You are a BNPL assistant. "
             "If the user asks anything related to BNPL data, customers, transactions, "
             "installments, risk scores, payments, due dates, or anything stored "
@@ -140,7 +140,7 @@ for request in user_requests:
             "If the message is a complaint or problem, call create_support_ticket. "
             "Otherwise, respond normally."
             "Always use markdown formatting for SQL queries."
-        ,
+    ),
         input=[request],
     )
 
@@ -164,8 +164,8 @@ for request in user_requests:
 
     final = client.responses.create(
         model=MODEL,
-        instructions=
-            "You are a BNPL assistant. "
+        instructions=(
+            "You are a BNPL assi)stant. "
             "If the user asks anything related to BNPL data, customers, transactions, "
             "installments, risk scores, payments, due dates, or anything stored in the "
             "database — ALWAYS call `bnpl_database_query` with an SQL query. "
@@ -177,7 +177,7 @@ for request in user_requests:
             "or anything that is not clearly a complaint or problem. "
             "If neither condition applies, respond normally."
             "If a ticket was created, mention the ticket number."
-        ,
+        ),
     input=messages_for_final,
     )
 
