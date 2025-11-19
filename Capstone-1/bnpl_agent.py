@@ -100,6 +100,7 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
             "NEVER invent new tables or columns."
             "If the message is a complaint or problem, call create_support_ticket. "
             "Otherwise, respond normally."
+            "Always use markdown formatting for SQL queries."
         ,
         input=[{"role": "user", "content": user_message}],
     )

@@ -139,6 +139,7 @@ for request in user_requests:
             "NEVER invent new tables or columns."
             "If the message is a complaint or problem, call create_support_ticket. "
             "Otherwise, respond normally."
+            "Always use markdown formatting for SQL queries."
         ,
         input=[request],
     )
