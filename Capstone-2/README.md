@@ -16,10 +16,10 @@ It ensures all outputs are **safe, family-friendly, and image-generation-complia
 
 ## 🧩 Features
 
-* 🎙 **Upload Audio** (mp3, wav, m4a, etc.)
+* 🎙 **Upload Audio** (mp3, wav (not tested: wav))
 * 📝 **Whisper Transcription**
 * 🛡 **GPT-4.1 Safe Prompt Rewriting**
-* 🎨 **Image Generation (DALL·E 3 / DALL·E 2)**
+* 🎨 **Image Generation (DALL·E 3)**
 * 💾 **Download Real Image File** (no corruption)
 * 🔁 **Session Persistence** (no content reset on download)
 * ⚠️ **Automatic Safety Filtering**
@@ -87,17 +87,4 @@ http://localhost:8501
 3️⃣ GPT-4.1 rewrites text into a **safe, child-friendly image prompt**
 4️⃣ DALL·E generates an image from that safe prompt
 5️⃣ Image is displayed and can be downloaded
-
----
-
-## 🛡 Safety Compliance
-
-The app automatically removes unsafe elements:
-
-* ❌ Violence
-* ❌ Explicit content
-* ❌ Real people / political figures
-* ❌ Illegal or harmful activity
-
-All outputs become **positive, harmless image descriptions**.
-You can download generated image at the end.
+6️⃣ All steps ensure compliance with safety and content guidelines
