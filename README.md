@@ -7,7 +7,7 @@ A Streamlit-based AI assistant for querying Buy Now Pay Later (BNPL) transaction
 
 ---
 
-# 🎤 → Voice to Image App (DALL·E 3) - Capstone Project 2
+# 🎤 → Image App (DALL·E 3) - Capstone Project 2
 
 Convert speech into safe, creative AI-generated images.
 
