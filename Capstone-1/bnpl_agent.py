@@ -5,8 +5,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, "db", "bnpl.db")
 
-# DATABASE = "db/bnpl.db"
-
 database_schema_string = """
 Table: transactions
 Columns: transaction_id, customer_id, merchant, category,
@@ -79,7 +77,30 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
     response = client.responses.create(
         model="gpt-4.1-2025-04-14",
         tools=tools,
-        instructions="Respond to the user's question with a clear, concise, markdown-formatted answer based on the database result. Use tables or bullets if helpful.",
+        instructions=
+            "You are a BNPL assistant. "
+            "If the user asks anything related to BNPL data, customers, transactions, "
+            "installments, risk scores, payments, due dates, or anything stored "
+            "in the database — ALWAYS call `bnpl_database_query` with an SQL query. "
+            "Do NOT answer using your own knowledge. "
+             "You are a BNPL database assistant. "
+            "The ONLY table in the entire database is: "
+            "Table: transactions "
+            "Columns: transaction_id, customer_id, merchant, category, "
+            "purchase_amount, installment_count, installment_amount, "
+            "purchase_date, final_due_date, status, credit_score, "
+            "risk_score, late_fee, default_flag "
+            "There are NO other tables. No merchants table, no categories table. "
+            "Merchants and categories exist ONLY as values inside the 'merchant' "
+            "and 'category' columns. "
+            "If the user asks for merchants, generate: "
+            "SELECT DISTINCT merchant FROM transactions; "
+            "If the user asks for categories, generate: "
+            "SELECT DISTINCT category FROM transactions; "
+            "NEVER invent new tables or columns."
+            "If the message is a complaint or problem, call create_support_ticket. "
+            "Otherwise, respond normally."
+        ,
         input=[{"role": "user", "content": user_message}],
     )
 
@@ -104,8 +125,21 @@ def run_bnpl_agent(user_message: str, openai_api_key: str) -> str:
 
     final = client.responses.create(
         model="gpt-4.1-2025-04-14",
-        instructions="Provide a clear, final answer. If a ticket was created, mention it. Show created ticket number.",
-        input=messages_for_final,
+        instructions=
+            "You are a BNPL assistant. "
+            "If the user asks anything related to BNPL data, customers, transactions, "
+            "installments, risk scores, payments, due dates, or anything stored in the "
+            "database — ALWAYS call `bnpl_database_query` with an SQL query. "
+            "Only call `create_support_ticket` if the user explicitly reports a problem, "
+            "complaint, error, failed payment, something not working, or asks for support/help. "
+            "Examples of messages that require a ticket: 'I have a problem', 'payment failed', "
+            "'something is not working', 'I need help with...', 'ошибка', 'не работает'. "
+            "Do NOT call create_support_ticket for general questions, analysis, browsing data, "
+            "or anything that is not clearly a complaint or problem. "
+            "If neither condition applies, respond normally."
+            "If a ticket was created, mention the ticket number."
+        ,
+    input=messages_for_final,
     )
 
     return final.output_text
