@@ -5,7 +5,10 @@ import tempfile
 import requests
 
 st.set_page_config(page_title="Voice → Image App", layout="centered")
-st.title("🎤 → Voice to Image App")
+st.title("🎤 → Voice to Image App (DALL·E 3)")
+st.markdown("""
+Upload a voice recording describing an image, and this app will transcribe the audio, rewrite the prompt to ensure it's safe for image generation, and then generate an image using DALL·E 3.
+""")
 
 openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
 
