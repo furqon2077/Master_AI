@@ -17,27 +17,28 @@ def safe_sql_check(query: str):
     dangerous_words = ["drop", "delete", "truncate", "alter"]
     lower_sql = query.lower()
     if any(word in lower_sql for word in dangerous_words):
-        print("❌ Dangerous SQL blocked:", query)
+        print("Dangerous SQL blocked:", query)
         raise Exception("Operation blocked: Unsafe SQL detected.")
 
 
 
 def bnpl_database_query(query):
     safe_sql_check(query)
-    print("🔍 Running SQL Query:", query)
+    print("Running SQL Query:", query)
     conn = sqlite3.connect(DATABASE)
     results = conn.execute(query).fetchall()
     conn.close()
-    print("➡️ SQL Result:", results)
+    print("SQL Result:", results)
     return results
 
 
 def create_support_ticket(issue: str):
-    print("📝 Creating Support Ticket:", issue)
-    ticket_id = f"TICKET-{abs(hash(issue)) % 100000}"
+    print("Creating Support Ticket:", issue)
+    import uuid
+    ticket_id = f"TICKET-{uuid.uuid4().hex[:6].upper()}"
     with open("support_tickets.txt", "a") as f:
         f.write(f"{ticket_id}: {issue}\n")
-    print("📨 Ticket Created:", ticket_id)
+    print("Ticket Created:", ticket_id)
     return {"ticket_id": ticket_id, "issue": issue}
 
 
