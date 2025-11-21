@@ -1,7 +1,7 @@
 import streamlit as st
 from bnpl_agent import run_bnpl_agent
 
-st.title("🦜Wellcome to the BNPL Chatbot")
+st.title("🦜Welcome to the BNPL Chatbot")
 
 openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
 
