@@ -2,6 +2,11 @@
 
 An AI-powered spiritual guide dedicated to searching God's Word across the **Torah, Bible, and Quran**. It provides scholarly answers with transparent citations and allows users to submit formal inquiries to human scholars.
 
+![Screenshot 2026-02-08 225418.png](assets/Screenshot%202026-02-08%20225418.png)
+![Screenshot 2026-02-08 225437.png](assets/Screenshot%202026-02-08%20225437.png)
+![Screenshot 2026-02-08 225559.png](assets/Screenshot%202026-02-08%20225559.png)
+![Screenshot 2026-02-08 225625.png](assets/Screenshot%202026-02-08%20225625.png)
+
 ## Features
 
 - **3-Script Search:** Simultaneously searches the Torah, Bible, and Quran to provide comparative wisdom.
