@@ -10,7 +10,7 @@ class TextChunker:
     Designed to be safe for embedding models and vector databases.
     """
 
-    def __init__(self, chunk_size: int = 800, chunk_overlap: int = 80):
+    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50):
         """
         Initialize the text chunker.
 
