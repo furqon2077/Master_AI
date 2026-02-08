@@ -1,5 +1,5 @@
-"""AI Agent with Google Gemini and function calling"""
-import google.generativeai as genai
+"""AI Agent with OpenAI GPT and function calling"""
+from openai import OpenAI
 from typing import List, Dict, Optional
 import json
 import logging
@@ -21,14 +21,9 @@ class CustomerSupportAgent:
             vector_store: VectorStore instance
             ticket_manager: TicketManager instance
         """
-        # Configure Gemini
-        genai.configure(api_key=Config.GOOGLE_API_KEY)
-        
-        # Initialize model with function calling
-        self.model = genai.GenerativeModel(
-            model_name=Config.GEMINI_MODEL,
-            tools=FUNCTION_DECLARATIONS
-        )
+        # Initialize OpenAI client
+        self.client = OpenAI(api_key=Config.OPENAI_API_KEY)
+        self.model = Config.OPENAI_MODEL
         
         # Initialize function executor
         company_info = {
@@ -60,17 +55,26 @@ class CustomerSupportAgent:
         if len(self.conversation_history) > Config.MAX_CONVERSATION_HISTORY * 2:
             self.conversation_history = self.conversation_history[-Config.MAX_CONVERSATION_HISTORY * 2:]
     
-    def get_chat_history_for_gemini(self) -> List[Dict]:
-        """Format chat history for Gemini API"""
-        formatted_history = []
+    def get_messages_for_openai(self, user_message: str) -> List[Dict]:
+        """Format messages for OpenAI API"""
+        messages = [
+            {"role": "system", "content": self.system_instruction}
+        ]
         
+        # Add conversation history
         for msg in self.conversation_history:
-            formatted_history.append({
-                "role": "user" if msg["role"] == "user" else "model",
-                "parts": [msg["content"]]
+            messages.append({
+                "role": msg["role"],
+                "content": msg["content"]
             })
         
-        return formatted_history
+        # Add current message
+        messages.append({
+            "role": "user",
+            "content": user_message
+        })
+        
+        return messages
     
     def process_message(self, user_message: str, user_name: str = None, user_email: str = None) -> str:
         """
@@ -88,34 +92,56 @@ class CustomerSupportAgent:
         self.add_to_history("user", user_message)
         
         try:
-            # Create chat session with history
-            chat = self.model.start_chat(history=self.get_chat_history_for_gemini())
+            # Prepare messages
+            messages = self.get_messages_for_openai(user_message)
             
-            # Send message
-            response = chat.send_message(user_message)
+            # Call OpenAI with function calling
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                tools=FUNCTION_DECLARATIONS,
+                tool_choice="auto",
+                temperature=Config.OPENAI_TEMPERATURE,
+                max_tokens=Config.OPENAI_MAX_TOKENS
+            )
             
             # Handle function calls
             max_iterations = 5
             iteration = 0
             
             while iteration < max_iterations:
-                # Check if there are function calls
-                if response.candidates[0].content.parts:
-                    part = response.candidates[0].content.parts[0]
+                message = response.choices[0].message
+                
+                # Check if there are tool calls
+                if message.tool_calls:
+                    # Add assistant message to messages
+                    messages.append(message)
                     
-                    # Check if it's a function call
-                    if hasattr(part, 'function_call') and part.function_call:
-                        function_call = part.function_call
-                        function_name = function_call.name
-                        function_args = dict(function_call.args)
+                    # Process each tool call
+                    for tool_call in message.tool_calls:
+                        function_name = tool_call.function.name
+                        function_args = json.loads(tool_call.function.arguments)
                         
                         logger.info(f"Function call: {function_name} with args: {function_args}")
                         
                         # Add user info to ticket creation if available
                         if function_name == "create_support_ticket":
-                            if user_name:
+                            # Only use default/session values if LLM didn't extract them
+                            if user_name and "user_name" not in function_args:
                                 function_args["user_name"] = user_name
-                            if user_email:
+                            elif user_name and function_args.get("user_name") in ["Guest", "Unknown", None, ""]:
+                                # If LLM put a placeholder, try to use session value (though session might also be Guest)
+                                # But if session is Guest, it's fine. If session was real name, we want it.
+                                # Actually, primarily we want to NOT overwrite if LLM found a real name.
+                                pass 
+                            
+                            # Simple logic: If LLM provided a value, trust it. If not, use passed value.
+                            # But wait, previous logic was ALWAYS overwrite. 
+                            # New logic: valid if key missing or empty.
+                            if not function_args.get("user_name") and user_name:
+                                function_args["user_name"] = user_name
+                                
+                            if not function_args.get("user_email") and user_email:
                                 function_args["user_email"] = user_email
                         
                         # Execute function
@@ -125,23 +151,31 @@ class CustomerSupportAgent:
                         
                         logger.info(f"Function result: {function_result}")
                         
-                        # Send function result back to model
-                        response = chat.send_message({
-                            "function_response": {
-                                "name": function_name,
-                                "response": function_result
-                            }
+                        # Add function result to messages
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "name": function_name,
+                            "content": json.dumps(function_result)
                         })
-                        
-                        iteration += 1
-                    else:
-                        # No function call, we have the final response
-                        break
+                    
+                    # Call OpenAI again with function results
+                    response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        tools=FUNCTION_DECLARATIONS,
+                        tool_choice="auto",
+                        temperature=Config.OPENAI_TEMPERATURE,
+                        max_tokens=Config.OPENAI_MAX_TOKENS
+                    )
+                    
+                    iteration += 1
                 else:
+                    # No more function calls, we have the final response
                     break
             
             # Extract final text response
-            final_response = response.text
+            final_response = response.choices[0].message.content
             
             # Add to history
             self.add_to_history("assistant", final_response)

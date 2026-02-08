@@ -1,22 +1,18 @@
 # Core dependencies
-streamlit==1.31.0
-python-dotenv==1.0.0
-
-# Google Gemini
-google-generativeai==0.3.2
+streamlit
+python-dotenv
+openai
 
 # Vector database
-chromadb==0.4.22
-sentence-transformers==2.3.1
+chromadb
+sentence-transformers
 
 # Document processing
-PyPDF2==3.0.1
-langchain==0.1.9
-langchain-community == 0.0.21
+PyPDF2
 
 # GitHub integration
-PyGithub==2.2.0
+PyGithub
 
 # Utilities
-pandas==2.1.4
-numpy==1.26.3
+pandas
+numpy

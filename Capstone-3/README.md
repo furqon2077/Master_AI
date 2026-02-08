@@ -1,130 +1,76 @@
-# Customer Support RAG System
+# Scripture Assistant (Divine Wisdom)
 
-A Customer Support solution powered by AI that can answer questions from datasources and create support tickets.
+An AI-powered spiritual guide dedicated to searching God's Word across the **Torah, Bible, and Quran**. It provides scholarly answers with transparent citations and allows users to submit formal inquiries to human scholars.
 
 ## Features
 
-- AI-powered question answering from PDF documents
-- Document citations with filename and page numbers
-- Support ticket creation via GitHub Issues
-- Conversation history management
-- Company context awareness
-- Web interface built with Streamlit
+- **3-Script Search:** Simultaneously searches the Torah, Bible, and Quran to provide comparative wisdom.
+- **Transparent Citations:** Every response lists the specific books and versions used (e.g., *King James Bible, John 3:16*).
+- **Conversational Inquiries:** If you report an error or provide feedback, the Assistant intelligently asks for your Name/Email and creates a formal support ticket.
+- **Divine Light UI:** A premium, forced Light Mode interface designed for readability and aesthetic beauty.
+- **GitHub Integration:** Inquiries are automatically tracked as GitHub Issues.
 
 ## Tech Stack
 
-- **LLM**: Google Gemini Pro with function calling
-- **Vector Database**: ChromaDB
-- **Issue Tracker**: GitHub Issues
-- **Web Framework**: Streamlit
-- **Python Version**: 3.11.9
+- **AI Model:** OpenAI `gpt-4o-mini`
+- **Vector Database:** ChromaDB (Local)
+- **Interface:** Streamlit
+- **Issue Tracking:** GitHub API
 
-## Prerequisites
+## Quick Start
 
-- Python 3.10 or higher
-- Google Gemini API key
-- GitHub personal access token
-- GitHub repository for storing support tickets
+1.  **Clone & Install**
+    ```bash
+    git clone <repository-url>
+    pip install -r requirements.txt
+    ```
 
-## Installation
+2.  **Configure Environment**
+    Create a `.env` file with your credentials (optional, or enter in UI):
+    ```ini
+    GITHUB_TOKEN=ghp_...
+    GITHUB_REPO_OWNER=your_username
+    GITHUB_REPO_NAME=your_repo_name
+    ```
+    *Note: OpenAI API Key can be entered directly in the App Sidebar.*
 
-1. Clone this repository or download the files
+3.  **Add Holy Books**
+    Place your PDF files (Torah, Bible, Quran) in the `data/documents` folder.
+    *Note: The system requires at least 3 documents to function correctly.*
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+4.  **Run the App**
+    ```bash
+    streamlit run app.py
+    ```
 
-3. Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
+## Usage Guide
 
-4. Configure your environment variables in `.env`:
-```
-GOOGLE_API_KEY=your_google_api_key
-GITHUB_TOKEN=your_github_token
-GITHUB_REPO_OWNER=your_username
-GITHUB_REPO_NAME=support-tickets
-COMPANY_NAME=Your Company Name
-COMPANY_EMAIL=support@company.com
-COMPANY_PHONE=+1-800-123-4567
-```
-
-5. Add your PDF documents to the `data/documents` folder:
-   - At least 3 documents required
-   - At least 2 PDF files
-   - At least 1 PDF with 400+ pages
-
-## Usage
-
-Run the Streamlit application:
-```bash
-streamlit run app.py
-```
-
-The application will:
-1. Load and process all PDF documents
-2. Create embeddings and store in ChromaDB
-3. Start the web interface at http://localhost:8501
-
-## How It Works
-
-1. **Document Processing**: PDFs are loaded and parsed with page tracking
-2. **Text Chunking**: Documents are split into chunks while preserving metadata
-3. **Vector Storage**: Chunks are embedded and stored in ChromaDB
-4. **AI Agent**: Google Gemini processes queries using function calling to:
-   - Search documents for answers
-   - Create support tickets when needed
-   - Provide company information
-5. **Citations**: Responses include source document and page numbers
-6. **Ticket Creation**: When answers aren't found, tickets are created in GitHub Issues
-
-## Project Structure
-
-```
-.
-├── app.py                          # Streamlit web application
-├── config.py                       # Configuration management
-├── requirements.txt                # Python dependencies
-├── .env                           # Environment variables (create from .env.example)
-├── src/
-│   ├── document_processor.py      # PDF loading and parsing
-│   ├── chunking.py                # Text chunking utilities
-│   ├── vector_store.py            # ChromaDB vector storage
-│   ├── agent.py                   # AI agent with Gemini
-│   ├── functions.py               # Function calling definitions
-│   ├── ticket_manager.py          # Ticket management
-│   └── integrations/
-│       └── github_issues.py       # GitHub Issues integration
-├── data/
-│   ├── documents/                 # PDF documents (add your files here)
-│   └── vector_db/                 # ChromaDB storage (auto-generated)
-└── tests/                         # Test files
-```
+- **Ask Questions:** "What do the scriptures say about patience?"
+- **Report Errors:** "I believe this verse citation is incorrect." -> System will ask for details and create a ticket.
+- **View Sources:** Check the "Sources Used" section at the bottom of every response.
 
 ## Deployment to HuggingFace Spaces
 
-1. Create a new Space on HuggingFace
-2. Select "Streamlit" as the SDK
-3. Upload your code files
-4. Add secrets in Space settings:
-   - `GOOGLE_API_KEY`
-   - `GITHUB_TOKEN`
-   - `GITHUB_REPO_OWNER`
-   - `GITHUB_REPO_NAME`
-5. Upload your PDF documents to `data/documents`
+This application is ready for HuggingFace Spaces.
 
-## Requirements
+1.  **Create New Space:**
+    *   Go to [HuggingFace Spaces](https://huggingface.co/spaces) and create a new Space.
+    *   Select **Streamlit** as the SDK.
 
-### Data Requirements
-- At least 3 documents as datasources
-- At least 2 PDF files
-- At least 1 PDF with 400+ pages
+2.  **Upload Files:**
+    *   Upload all files from this repository (excluding `.env`, `.git`, `__pycache__`).
+    *   Ensure `requirements.txt` is present.
 
-### Technical Requirements
-- Python with version specification
-- Function calling implementation
-- Vector storage for document retrieval
-- Document citations with page numbers
-- Conversation history support
+3.  **Configure Secrets:**
+    *   Go to **Settings** > **Variables and secrets**.
+    *   Add the following **Secrets**:
+        *   `OPENAI_API_KEY`: Your OpenAI Key.
+        *   `GITHUB_TOKEN`: Your GitHub Token.
+    *   Add the following **Variables** (optional overrides):
+        *   `GITHUB_REPO_OWNER`
+        *   `GITHUB_REPO_NAME`
+
+4.  **Documents:**
+    *   Ensure your `data/documents` folder containing the holy books (PDFs) is uploaded.
+
+The app will build and launch automatically!

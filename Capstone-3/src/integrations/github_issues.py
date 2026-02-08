@@ -86,9 +86,35 @@ class GitHubIssuesClient:
             
         except GithubException as e:
             logger.error(f"Failed to create GitHub issue: {str(e)}")
+            logger.error(f"Status: {e.status}")
+            logger.error(f"Data: {e.data}")
+            logger.error(f"Headers: {e.headers}")
+            
+            if e.status == 404:
+                return {
+                    "success": False,
+                    "error": f"Repository not found or token missing permissions. Check if {self.repo_owner}/{self.repo_name} exists and token has 'repo' scope."
+                }
+            elif e.status == 401:
+                 return {
+                    "success": False,
+                    "error": "Authentication failed. Check if GITHUB_TOKEN is valid."
+                }
+            elif e.status == 403:
+                 return {
+                    "success": False,
+                    "error": "Permission denied. Token may lack 'repo' scope or be rate limited."
+                }
+            
             return {
                 "success": False,
-                "error": str(e)
+                "error": f"GitHub API Error: {str(e)}"
+            }
+        except Exception as e:
+            logger.error(f"Unexpected error creating issue: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Unexpected error: {str(e)}"
             }
     
     def get_issue(self, issue_number: int):

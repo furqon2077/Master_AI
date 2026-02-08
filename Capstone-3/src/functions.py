@@ -1,4 +1,4 @@
-"""Function calling definitions for the AI agent"""
+"""Function calling definitions for OpenAI"""
 import json
 from typing import Dict, List, Optional
 import logging
@@ -7,55 +7,65 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Function schemas for Google Gemini function calling
+# Function declarations for OpenAI function calling
+# OpenAI uses a simpler, more stable format
 FUNCTION_DECLARATIONS = [
     {
-        "name": "search_documents",
-        "description": "Search the knowledge base for information to answer user questions. Use this when the user asks a question that might be answered in the documentation.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "The search query to find relevant information in the knowledge base"
-                }
-            },
-            "required": ["query"]
+        "type": "function",
+        "function": {
+            "name": "search_documents",
+            "description": "Search the knowledge base for information to answer user questions. Use this when the user asks a question that might be answered in the documentation.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query to find relevant information in the knowledge base"
+                    }
+                },
+                "required": ["query"]
+            }
         }
     },
     {
-        "name": "create_support_ticket",
-        "description": "Create a support ticket when the user requests it or when you cannot find an answer in the knowledge base. The ticket will be created in the issue tracking system.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "user_name": {
-                    "type": "string",
-                    "description": "The user's full name"
+        "type": "function",
+        "function": {
+            "name": "create_support_ticket",
+            "description": "Create a support ticket when the user requests it or when you cannot find an answer in the knowledge base. The ticket will be created in the issue tracking system.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "user_name": {
+                        "type": "string",
+                        "description": "The user's full name"
+                    },
+                    "user_email": {
+                        "type": "string",
+                        "description": "The user's email address"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "description": "Brief summary/title of the issue (one sentence)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Detailed description of the issue or question"
+                    }
                 },
-                "user_email": {
-                    "type": "string",
-                    "description": "The user's email address"
-                },
-                "summary": {
-                    "type": "string",
-                    "description": "Brief summary/title of the issue (one sentence)"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Detailed description of the issue or question"
-                }
-            },
-            "required": ["user_name", "user_email", "summary", "description"]
+                "required": ["user_name", "user_email", "summary", "description"]
+            }
         }
     },
     {
-        "name": "get_company_info",
-        "description": "Get company contact information when the user asks about how to contact support, company details, or wants to speak with someone.",
-        "parameters": {
-            "type": "object",
-            "properties": {},
-            "required": []
+        "type": "function",
+        "function": {
+            "name": "get_company_info",
+            "description": "Get company contact information when the user asks about how to contact support, company details, or wants to speak with someone.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
         }
     }
 ]

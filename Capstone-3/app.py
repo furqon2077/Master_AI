@@ -11,35 +11,78 @@ from src.ticket_manager import TicketManager
 from src.agent import CustomerSupportAgent
 
 # Page configuration
+# Page configuration
 st.set_page_config(
-    page_title="Customer Support Assistant",
-    page_icon="🎧",
+    page_title="Divine Wisdom - Scripture Assistant",
+    page_icon=None,
     layout="wide"
 )
 
-# Custom CSS
+# Custom CSS for Forced Light Theme
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
+    /* FORCED LIGHT MODE THEME */
+    .stApp {
+        background-color: #ffffff;
+        color: #2c3e50;
     }
-    .sub-header {
-        font-size: 1.2rem;
-        color: #666;
-        margin-bottom: 2rem;
+    
+    /* Typography */
+    h1, h2, h3, h4, h5, h6, p, div {
+        color: #2c3e50 !important;
     }
+    
+    /* Message Bubbles */
     .chat-message {
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 1rem;
+        padding: 1.5rem;
+        border-radius: 0.8rem;
+        margin-bottom: 1.5rem;
+        font-family: 'Georgia', serif;
+        line-height: 1.6;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        color: #2c3e50;
     }
+    
     .user-message {
-        background-color: #e3f2fd;
+        background-color: #f0f7ff; /* Crisp Light Blue */
+        border: 1px solid #cce5ff;
+        border-left: 5px solid #0056b3;
     }
+    
     .assistant-message {
-        background-color: #f5f5f5;
+        background-color: #fffbf0; /* Warm Cream */
+        border: 1px solid #f0e6cc;
+        border-left: 5px solid #d4af37; /* Gold */
+    }
+
+    /* HEADER */
+    .main-header {
+        font-family: 'Georgia', serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        border-bottom: 3px solid #d4af37;
+        padding-bottom: 1.5rem;
+        color: #2c3e50 !important;
+        letter-spacing: -0.5px;
+    }
+    
+    .sub-header {
+        font-family: 'Georgia', serif;
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        font-style: italic;
+        color: #5d4037 !important;
+        opacity: 0.9;
+    }
+    
+    /* Input Areas */
+    .stTextInput input {
+        background-color: #ffffff !important;
+        color: #2c3e50 !important;
+        border: 1px solid #d4af37 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -68,10 +111,13 @@ def initialize_system():
     chunked_docs = chunker.chunk_documents(documents)
     
     # Initialize vector store
-    vector_store = VectorStore(
-        persist_dir=Config.CHROMA_PERSIST_DIR,
-        collection_name=Config.COLLECTION_NAME
-    )
+    try:
+        vector_store = VectorStore(
+            persist_dir=Config.CHROMA_PERSIST_DIR,
+            collection_name=Config.COLLECTION_NAME
+        )
+    except Exception as e:
+        return None, f"Error initializing vector store: {str(e)}"
     
     # Check if we need to initialize the vector store
     if vector_store.get_collection_count() == 0:
@@ -87,8 +133,15 @@ def initialize_system():
     except Exception as e:
         return None, f"Error initializing ticket manager: {str(e)}"
     
+    # Validate OpenAI API Key
+    if not Config.OPENAI_API_KEY:
+        return None, "OpenAI API Key is missing. Please add OPENAI_API_KEY to your .env file."
+        
     # Initialize agent
-    agent = CustomerSupportAgent(vector_store, ticket_manager)
+    try:
+        agent = CustomerSupportAgent(vector_store, ticket_manager)
+    except Exception as e:
+        return None, f"Error initializing AI agent: {str(e)}"
     
     return agent, None
 
@@ -97,8 +150,37 @@ def main():
     """Main application"""
     
     # Header
-    st.markdown('<div class="main-header">Customer Support Assistant</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="sub-header">Powered by AI - {Config.COMPANY_NAME}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-header">{Config.APP_TITLE}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sub-header">Comparing Wisdom across Torah, Bible, and Quran</div>', unsafe_allow_html=True)
+    
+    # Sidebar Configuration
+    with st.sidebar:
+        st.header("⚙️ Settings")
+        
+        # API Key Input
+        api_key_input = st.text_input(
+            "OpenAI API Key",
+            type="password",
+            placeholder="sk-...",
+            help="Enter your OpenAI API Key to start the assistant",
+            value=""
+        )
+        
+        
+        if api_key_input:
+            Config.OPENAI_API_KEY = api_key_input
+        
+        # Remove contact info from UI as requested
+        st.markdown("---")
+        st.markdown("**Author: Furkat Sidikov**")
+        
+        st.divider()
+        
+        if st.button("Begin New Inquiry", use_container_width=True):
+            st.session_state.messages = []
+            if st.session_state.agent:
+                st.session_state.agent.clear_history()
+            st.rerun()
     
     # Initialize session state
     if "messages" not in st.session_state:
@@ -108,44 +190,16 @@ def main():
         st.session_state.agent = None
         st.session_state.error = None
     
+    # Initialize system variables implicitly (no sidebar inputs)
     if "user_name" not in st.session_state:
-        st.session_state.user_name = ""
+        st.session_state.user_name = "Guest"
     
     if "user_email" not in st.session_state:
-        st.session_state.user_email = ""
-    
-    # Sidebar - User Information
-    with st.sidebar:
-        st.header("User Information")
-        st.session_state.user_name = st.text_input(
-            "Your Name",
-            value=st.session_state.user_name,
-            placeholder="John Doe"
-        )
-        st.session_state.user_email = st.text_input(
-            "Your Email",
-            value=st.session_state.user_email,
-            placeholder="john@example.com"
-        )
-        
-        st.divider()
-        
-        st.header("Company Contact")
-        st.write(f"**{Config.COMPANY_NAME}**")
-        st.write(f"Email: {Config.COMPANY_EMAIL}")
-        st.write(f"Phone: {Config.COMPANY_PHONE}")
-        
-        st.divider()
-        
-        if st.button("Clear Conversation"):
-            st.session_state.messages = []
-            if st.session_state.agent:
-                st.session_state.agent.clear_history()
-            st.rerun()
+        st.session_state.user_email = "guest@example.com"
     
     # Initialize system if not done
     if st.session_state.agent is None and st.session_state.error is None:
-        with st.spinner("Initializing support system..."):
+        with st.spinner("Preparing the wisdom repository..."):
             agent, error = initialize_system()
             st.session_state.agent = agent
             st.session_state.error = error
@@ -156,27 +210,47 @@ def main():
         st.info("Please check your configuration and try again.")
         return
     
-    # Display chat messages
-    for message in st.session_state.messages:
-        role = message["role"]
-        content = message["content"]
-        
-        with st.chat_message(role):
-            st.markdown(content)
+    # Display chat messages with a centered container
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.messages:
+            role = message["role"]
+            content = message["content"]
+            
+            with st.chat_message(role):
+                st.markdown(content)
     
-    # Chat input
-    if prompt := st.chat_input("How can I help you today?"):
+    # Input area in the middle of the page (not fixed at bottom)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Create a form for input to allow "Enter" to submit
+    with st.form(key="chat_form", clear_on_submit=True):
+        col1, col2 = st.columns([6, 1])
+        
+        with col1:
+            user_input = st.text_input(
+                "Seek wisdom from the texts...",
+                placeholder="Ask your question here...",
+                key="user_input_widget",
+                label_visibility="collapsed"
+            )
+        
+        with col2:
+            submit_button = st.form_submit_button("Ask", use_container_width=True)
+    
+    if submit_button and user_input:
         # Add user message
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.messages.append({"role": "user", "content": user_input})
         
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        # Rerun to show user message immediately
+        st.rerun()
         
-        # Generate response
+    # Generate response if last message is from user
+    if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
         with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
+            with st.spinner("Consulting the sacred texts..."):
                 response = st.session_state.agent.process_message(
-                    user_message=prompt,
+                    user_message=st.session_state.messages[-1]["content"],
                     user_name=st.session_state.user_name if st.session_state.user_name else None,
                     user_email=st.session_state.user_email if st.session_state.user_email else None
                 )
@@ -184,7 +258,7 @@ def main():
         
         # Add assistant message
         st.session_state.messages.append({"role": "assistant", "content": response})
-
+        st.rerun()
 
 if __name__ == "__main__":
     main()
