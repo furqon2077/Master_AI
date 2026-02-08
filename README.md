@@ -16,12 +16,12 @@ Convert speech into safe, creative AI-generated images.
 
 ---
 
-# Capstone Project 3 - Speech To Image App (DALL·E 3)
+# Capstone Project 3 - RAG
 
-Convert speech into safe, creative AI-generated images.
+Build a Customer Support solution able to answer questions and raise support tickets.
 
 **Live Demo:**
-[https://furqon2077-master-ai-capstone-2main-rdypls.streamlit.app/](https://furqon2077-master-ai-capstone-2main-rdypls.streamlit.app/)
+https://huggingface.co/spaces/Furqon2077/master-ai-capstones
 
 ---
 
