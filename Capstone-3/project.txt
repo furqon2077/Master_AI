@@ -1,0 +1,29 @@
+Objective:
+Build a Customer Support solution able to answer questions and raise support tickets.
+
+Business features:
+Via web chat user can ask questions and get answers from datasources
+If the answer is not found the system suggest user to create a support ticket
+User can instruct system to create a support ticket
+Support ticket should have user name, user email, summary (title) and description with details
+Support ticket should be put into issue tracking system (Jira/Trello/Github etc.)
+System should cite document and page when answering from data, e.g. if the answer is from toyota-hilux manual system should mention the file name and the page with source
+System should support conversation history and keep the chat messages in context window
+AI system should know about the company it's working in, like name and contact information (phone/email)
+
+Data:
+at least 3 documents should be used as a datasource
+at least 2 documents should be PDF
+at least 1 document should have 400 or more pages of PDF
+
+Technical requirements:
+Solution should be build with python
+Python version and dependencies should be in the repository
+Solution may use any vector storage
+Function calling is a must
+
+Interface:
+Web UI should be build with Streamlit or Gradio
+
+Deployment:
+Solution should be hosted at HuggingFace spaces
