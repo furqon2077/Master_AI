@@ -21,13 +21,13 @@ Convert speech into safe, creative AI-generated images.
 Build a Customer Support solution able to answer questions and raise support tickets.
 
 **Live Demo:**
-https://huggingface.co/spaces/Furqon2077/master-ai-capstones
+https://furqon2077-master-ai-capstone-3app-fsrj3q.streamlit.app/
 
 ---
 
-# Capstone Project 4 - Speech To Image App (DALL·E 3)
+# Capstone Project 4 - ART
 
-Convert speech into safe, creative AI-generated images.
+Design new cover for the media piece. You goal is to create alternative variation of some iconic media, like a book, cd album, vinyl album or DVD box with movie.
 
 **Live Demo:**
 [https://furqon2077-master-ai-capstone-2main-rdypls.streamlit.app/](https://furqon2077-master-ai-capstone-2main-rdypls.streamlit.app/)
