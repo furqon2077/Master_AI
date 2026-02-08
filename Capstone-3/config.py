@@ -1,6 +1,7 @@
 """
 Configuration management for Customer Support RAG System
 """
+from pathlib import Path
 import os
 from dotenv import load_dotenv
 
@@ -9,40 +10,63 @@ load_dotenv()
 
 class Config:
     """Application configuration"""
-    
+
+    # ------------------------------------------------------------------
+    # Base paths (ANCHOR EVERYTHING TO THE REPO ROOT)
+    # ------------------------------------------------------------------
+    BASE_DIR = Path(__file__).resolve().parent
+
+    DATA_DIR = BASE_DIR / "data"
+    DOCUMENTS_DIR = DATA_DIR / "documents"
+    VECTOR_DB_DIR = DATA_DIR / "vector_db"
+
+    # ------------------------------------------------------------------
     # OpenAI Configuration
+    # ------------------------------------------------------------------
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    OPENAI_MODEL = "gpt-4o-mini"  # Cheapest GPT model
+    OPENAI_MODEL = "gpt-4o-mini"
     OPENAI_TEMPERATURE = 0.7
     OPENAI_MAX_TOKENS = 1000
-    
-    # GitHub
+
+    # ------------------------------------------------------------------
+    # GitHub Configuration (for ticketing)
+    # ------------------------------------------------------------------
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     GITHUB_REPO_OWNER = os.getenv("GITHUB_REPO_OWNER")
     GITHUB_REPO_NAME = os.getenv("GITHUB_REPO_NAME")
-    
-    # Project Identity
+
+    # ------------------------------------------------------------------
+    # App Identity
+    # ------------------------------------------------------------------
     COMPANY_NAME = os.getenv("COMPANY_NAME", "Scripture Search")
     APP_TITLE = "Search God's Word in 3 Scripts"
     COMPANY_EMAIL = os.getenv("COMPANY_EMAIL", "guidance@divinewisdom.com")
     COMPANY_PHONE = os.getenv("COMPANY_PHONE", "+1-800-WISDOM-1")
-    
-    # ChromaDB
-    CHROMA_PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./data/vector_db")
+
+    # ------------------------------------------------------------------
+    # Vector Store (ChromaDB)
+    # ------------------------------------------------------------------
+    CHROMA_PERSIST_DIR = VECTOR_DB_DIR
     COLLECTION_NAME = os.getenv("COLLECTION_NAME", "sacred_texts")
-    
+
+    # ------------------------------------------------------------------
     # Document Processing
-    DOCUMENTS_DIR = "./data/documents"
+    # ------------------------------------------------------------------
     CHUNK_SIZE = 1000
     CHUNK_OVERLAP = 200
-    
+
+    # ------------------------------------------------------------------
     # Retrieval Settings
-    TOP_K_RESULTS = 5  # Increased to find matches across multiple scripts
-    SIMILARITY_THRESHOLD = 0.6 # Lowered slightly to capture broader semantic meaning
-    
+    # ------------------------------------------------------------------
+    TOP_K_RESULTS = 5
+    SIMILARITY_THRESHOLD = 0.6
+
+    # ------------------------------------------------------------------
     # Agent Settings
+    # ------------------------------------------------------------------
     MAX_CONVERSATION_HISTORY = 10
-    SYSTEM_PROMPT = f"""You are a divine assistant dedicated to searching God's word across the three holy scripts (Torah, Bible, Quran).
+
+    SYSTEM_PROMPT = """You are a divine assistant dedicated to searching God's word across the three holy scripts (Torah, Bible, Quran).
 
 Your Core Mission:
 1. Search and retrieve wisdom from ALL three scripts when answering inquiries.
@@ -54,9 +78,10 @@ Ticket Creation Policy:
 - ACTION:
     1. First, acknowledge the feedback gratefully.
     2. Check if you have the user's Name and Email.
-    3. IF MISSING Name/Email: Ask the user politely: "To officially record this for our scholars, may I have your Name and Email address?"
-    4. IF PROVIDED: Call `create_support_ticket` with their Name, Email, and their specific feedback as the Description.
-- RESPONSE: After successfully creating the ticket, confirm with: "Thank you [Name]. I have created inquiry #[Ticket Number]. Our scholars will review this error."
+    3. IF MISSING Name/Email: Ask the user politely for them.
+    4. IF PROVIDED: Call `create_support_ticket` with Name, Email, and feedback.
+- RESPONSE:
+    "Thank you [Name]. I have created inquiry #[Ticket Number]. Our scholars will review this."
 
 General Guidelines:
 - Answer questions based ONLY on the provided holy books.
@@ -64,38 +89,34 @@ General Guidelines:
 - If the information is not in the documents, humbly suggest asking a scholar.
 
 Response Structure:
-1. **Divine Guidance:** The main answer, citing specific verses/pages inline (e.g., [Quran, 2:255]).
-2. **Sources Used:** A strictly listed section at the bottom showing which books were consulted.
-   Example:
-   ### Sources Used
-   - The Holy Quran (Sahih International)
-   - King James Bible
-3. **Feedback Invitation:** "If you found any error in this guidance or need further clarification, please leave a comment, and we can submit a formal inquiry to our scholars."
-
-You have access to the following functions:
-- search_documents: Search the sacred texts for wisdom and answers.
-- create_support_ticket: Submit a formal inquiry/ticket. Use this ONLY after collecting Name/Email.
-- get_company_info: Get contact information.
+1. **Divine Guidance**
+2. **Sources Used**
+3. **Feedback Invitation**
 """
 
-# Validate required configuration
+# ----------------------------------------------------------------------
+# Configuration Validation
+# ----------------------------------------------------------------------
 def validate_config():
-    """Validate that required configuration is present"""
+    """Validate required configuration values"""
     errors = []
-    
+
     if not Config.OPENAI_API_KEY:
         errors.append("OPENAI_API_KEY is not set")
-    
+
     if not Config.GITHUB_TOKEN:
         errors.append("GITHUB_TOKEN is not set")
-    
+
     if not Config.GITHUB_REPO_OWNER:
         errors.append("GITHUB_REPO_OWNER is not set")
-    
+
     if not Config.GITHUB_REPO_NAME:
         errors.append("GITHUB_REPO_NAME is not set")
-    
+
+    if not Config.DOCUMENTS_DIR.exists():
+        errors.append(f"Documents directory not found: {Config.DOCUMENTS_DIR}")
+
     if errors:
-        raise ValueError(f"Configuration errors: {', '.join(errors)}")
-    
+        raise ValueError("Configuration errors: " + ", ".join(errors))
+
     return True
